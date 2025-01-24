@@ -7,18 +7,21 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
 export async function getArticles() {
-  const { data, error } = await supabase.from("articles").select("*").order("created_at", { ascending: false })
+  const { data, error } = await supabase.from("ditorja_frontend").select("*").order("created_at", { ascending: false })
 
   if (error) {
     console.error("Error fetching articles:", error)
     return []
   }
 
-  return data as Article[]
+  return data.map((article: any) => ({
+    ...article,
+    article_hashtags: article.article_hashtags || []
+  })) as Article[]
 }
 
 export async function getArticleById(id: string) {
-  const { data, error } = await supabase.from("articles").select("*").eq("id", id).single()
+  const { data, error } = await supabase.from("ditorja_frontend").select("*").eq("id", id).single()
 
   if (error) {
     console.error("Error fetching article:", error)
@@ -27,4 +30,3 @@ export async function getArticleById(id: string) {
 
   return data as Article
 }
-

@@ -1,4 +1,4 @@
-create table articles (
+create table ditorja_frontend (
   id uuid default gen_random_uuid() primary key,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   article_title text not null,
@@ -12,8 +12,7 @@ create table articles (
 );
 
 -- Create an index on created_at for better performance when ordering
-create index articles_created_at_idx on articles(created_at desc);
+create index ditorja_frontend_created_at_idx on ditorja_frontend(created_at desc);
 
 -- Create an index on category for better performance when filtering
-create index articles_category_idx on articles(article_category);
-
+create index ditorja_frontend_category_idx on ditorja_frontend(article_category);
