@@ -31,7 +31,8 @@ export async function getArticles() {
         article_image,
         article_category,
         article_hashtag,
-        created_at
+        created_at,
+        status
       `)
       .order("created_at", { ascending: false })
       .limit(10)
@@ -83,7 +84,8 @@ export async function getArticles() {
       
       return {
         ...article,
-        article_hashtags: hashtags
+        article_hashtags: hashtags,
+        status: article.status || 'normal'
       };
     }) as Article[]
   } catch (error) {
@@ -104,7 +106,8 @@ export async function getArticleById(id: string) {
       article_image,
       article_category,
       article_hashtag,
-      created_at
+      created_at,
+      status
     `)
     .eq("id", id)
     .single()
@@ -116,6 +119,7 @@ export async function getArticleById(id: string) {
 
   return {
     ...data,
-    article_hashtags: data.article_hashtag ? data.article_hashtag.split('\n') : []
+    article_hashtags: data.article_hashtag ? data.article_hashtag.split('\n') : [],
+    status: data.status || 'normal'
   } as Article
 }
