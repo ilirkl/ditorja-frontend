@@ -1,18 +1,27 @@
-create table ditorja_frontend (
-  id uuid default gen_random_uuid() primary key,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  article_title text not null,
-  article_short text not null,
-  article_medium text not null,
-  article_large text not null,
-  article_image text not null,
-  article_category text not null,
-  article_hashtags text[] not null,
-  author text not null
+-- Create table with all required fields
+CREATE TABLE IF NOT EXISTS public.ditorja_frontend (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    article_title TEXT NOT NULL,
+    article_short TEXT NOT NULL,
+    article_medium TEXT,
+    article_large TEXT,
+    article_image TEXT,
+    article_category TEXT NOT NULL,
+    article_hashtags TEXT[],
+    author TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create an index on created_at for better performance when ordering
-create index ditorja_frontend_created_at_idx on ditorja_frontend(created_at desc);
+-- Enable RLS
+ALTER TABLE public.ditorja_frontend ENABLE ROW LEVEL SECURITY;
 
--- Create an index on category for better performance when filtering
-create index ditorja_frontend_category_idx on ditorja_frontend(article_category);
+-- Create read access policy
+CREATE POLICY "Allow public read access" 
+ON public.ditorja_frontend 
+FOR SELECT 
+TO anon 
+USING (true);
+
+-- Grant permissions
+GRANT SELECT ON TABLE public.ditorja_frontend TO anon;
+GRANT USAGE ON SCHEMA public TO anon;

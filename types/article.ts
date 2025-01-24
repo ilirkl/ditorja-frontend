@@ -2,6 +2,7 @@ export type Article = {
   id: string
   article_title: string
   article_short: string
+  article_content: string
   article_medium: string
   article_large: string
   article_image: string
@@ -10,4 +11,3 @@ export type Article = {
   created_at: string
   author: string
 }
-
