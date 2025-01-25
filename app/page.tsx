@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge"
+import { Badge, Category } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Image from "next/image"
@@ -61,7 +61,7 @@ export default function NewsApp() {
         {featuredArticle && (
           <article className="py-6">
             <div className="space-y-4">
-              <Badge className="category text-sm text-blue-600 text-transform-uppercase">{featuredArticle.article_category}</Badge>
+              <Category className="text-sm">{featuredArticle.article_category}</Category>
               <Link href={`/article/${featuredArticle.id}`}>
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight title-hover">{featuredArticle.article_title}</h1>
               </Link>
@@ -134,9 +134,7 @@ export default function NewsApp() {
                 <Card key={article.id} className="border-0 shadow-none">
                   <CardContent className="p-0">
                     <div className="">
-                      <Badge className="text-sm text-blue-600 text-transform-uppercase" variant="secondary">
-                        {article.article_category}
-                      </Badge>
+                      <Category className="text-sm">{article.article_category}</Category>
                       <div className="space-y-2">
                         <div 
                           className="cursor-pointer"
@@ -221,7 +219,7 @@ export default function NewsApp() {
                       className="object-cover w-full h-auto"
                     />
                     <div className="p-4 space-y-2">
-                      <Badge className="category text-sm text-blue-600 text-transform-uppercase">{article.article_category}</Badge>
+                      <Category className="text-sm">{article.article_category}</Category>
                       <h3 className="font-bold title-hover">{article.article_title}</h3>
                       <p className="text-sm text-muted-foreground">{article.article_short}</p>
                       <div className="flex flex-wrap gap-2">

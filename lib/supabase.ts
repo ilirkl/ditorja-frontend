@@ -15,10 +15,6 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 })
 
 export async function getArticles() {
-  console.log("Fetching articles from Supabase...")
-  console.log("Using URL:", supabaseUrl)
-  console.log("Using Key:", supabaseKey)
-  
   try {
     const { data, error } = await supabase
       .from("ditorja_frontend")
@@ -38,44 +34,14 @@ export async function getArticles() {
       .limit(10)
       
     if (error) {
-      console.error("Supabase error details:", {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint
-      })
-      console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL)
-      console.log("Supabase Key:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-      console.log("Table schema:", await supabase.rpc('get_table_schema', { table_name: 'ditorja_frontend' }))
+      if (error instanceof Error) {
+      console.error("Error fetching articles:", error.message)
+    } else {
+      console.error("Unexpected error fetching articles:", error)
+    }
       return []
     }
 
-    console.log("Supabase connection successful")
-    // Check table existence by attempting to fetch metadata
-    // Directly attempt to query the table with schema prefix
-    const { data: tableInfo, error: tableError } = await supabase
-      .from('ditorja_frontend')
-      .select('*')
-      .limit(1)
-      
-    if (tableError) {
-      console.error("Table access error:", {
-        message: tableError.message,
-        code: tableError.code,
-        details: tableError.details,
-        hint: tableError.hint
-      })
-      return []
-    }
-    
-    console.log("Table access successful")
-
-    // Get detailed row count
-    const { count } = await supabase
-      .from('ditorja_frontend')
-      .select('*', { count: 'exact', head: true })
-    console.log("Row count:", count)
-    console.log("Articles fetched:", data)
 
     return data.map((article: any) => {
       // Handle both article_hashtags (array) and article_hashtag (string) formats
@@ -89,7 +55,7 @@ export async function getArticles() {
       };
     }) as Article[]
   } catch (error) {
-    console.error("Unexpected error fetching articles:", error)
+    console.error("Error fetching articles:", error.message)
     return []
   }
 }
@@ -113,7 +79,7 @@ export async function getArticleById(id: string) {
     .single()
 
   if (error) {
-    console.error("Error fetching article:", error)
+    console.error("Error fetching article:", error.message)
     return null
   }
 
