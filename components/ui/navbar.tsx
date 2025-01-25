@@ -10,7 +10,7 @@ export function Navbar() {
         <Link href="/" className="flex items-center pl-3.5 ">
           <div className="w-[200px] h-[50px] relative">
             <Image
-              src="/brand-logo.svg"
+              src="/LAJMI365.svg"
               alt="Logo"
               fill
               priority

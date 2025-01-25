@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import Image from "next/image"
 import Link from "next/link"
 import { Navbar } from "@/components/ui/navbar"
+import { Footer } from "@/components/ui/footer"
 import { getArticles } from "@/lib/supabase"
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -104,7 +105,7 @@ export default function NewsApp() {
                     className="text-sm text-blue-600 hover:underline block"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    Read more →
+                    Lexo →
                   </Link>
                 )}
               </div>
@@ -181,7 +182,7 @@ export default function NewsApp() {
                             className="text-sm text-blue-600 hover:underline block"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            Read more →
+                            Lexo →
                           </Link>
                         )}
                       </div>
@@ -237,6 +238,8 @@ export default function NewsApp() {
           </div>
         </section>
       </main>
+      
+      <Footer />
     </div>
   )
 }

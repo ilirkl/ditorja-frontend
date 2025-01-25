@@ -6,7 +6,7 @@ export function Footer() {
       <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
           <p className="text-center text-sm leading-loose text-muted-foreground">
-            &copy; 2025 Ditorja. All rights reserved.
+            &copy; 2025 LAJMI365. All rights reserved.
           </p>
         </div>
         <nav className="flex items-center space-x-4">
