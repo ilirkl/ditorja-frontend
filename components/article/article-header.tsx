@@ -16,7 +16,7 @@ export function ArticleHeader({
         ← Kthehu
       </Link>
       <div>
-        <Link href={`/category/${category.slug}`}>
+        <Link href={`/categories/${category.slug}`}>
           <Category className="text-sm mb-2">{category.name}</Category>
         </Link>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">{title}</h1>

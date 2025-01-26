@@ -38,7 +38,7 @@ export function CategoryArticlesSection({
                       }}
                     >
                       <div className="flex items-center justify-between w-full">
-                        <h3 className="title-hover font-sohne-medium">{article.article_title}</h3>
+                        <h3 className="title-hover font-bold font-sohne-medium">{article.article_title}</h3>
                         {expandedId === article.id ? (
                           <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
                         ) : (
@@ -71,7 +71,7 @@ export function CategoryArticlesSection({
                     
                     {expandedId === article.id && expandedSummaryId === article.id && (
                       <Link 
-                        href={`/article/${article.id}`}
+                        href={`/article/${article.title_slug}`}
                         className="text-sm text-blue-600 hover:underline block"
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -81,13 +81,7 @@ export function CategoryArticlesSection({
                   </div>
                   <div className="flex gap-4 text-sm text-muted-foreground">
                     <time>{new Date(article.created_at).toLocaleDateString()}</time>
-                    <div className="flex flex-wrap gap-2">
-                      {article.article_hashtags?.slice(0, 3).map((tag) => (
-                        <span key={tag} className="bg-gray-100 px-2 py-1 rounded-full text-sm">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
+                    
                   </div>
                 </div>
               </CardContent>

@@ -112,13 +112,7 @@ export default function NewsApp() {
                   </Link>
                 )}
               </div>
-              <div className="flex flex-wrap gap-2">
-                {featuredArticle.article_hashtags?.slice(0, 3).map((tag: string) => (
-                  <Badge key={tag} variant="secondary">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
+              
             </div>
           </article>
         )}
@@ -128,13 +122,13 @@ export default function NewsApp() {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Te Fundit</h2>
             <Link href="/articles" className="text-sm text-blue-600 hover:underline">
-              ALL STORIES →
+              Shiko Gjitha →
             </Link>
           </div>
 
           <ScrollArea className="h-[400px] sm:h-[600px] pr-2 sm:pr-4">
             <div className="space-y-6">
-              {latestArticles.map((article) => (
+              {latestArticles.slice(0, 5).map((article) => (
                 <Card key={article.id} className="border-0 shadow-none">
                   <CardContent className="p-0">
                     <div className="">
@@ -193,13 +187,7 @@ export default function NewsApp() {
                       </div>
                       <div className="flex gap-4 text-sm text-muted-foreground">
                         <time>{new Date(article.created_at).toLocaleDateString()}</time>
-                        <div className="flex flex-wrap gap-2">
-                          {article.article_hashtags?.slice(0, 3).map((tag) => (
-                            <Badge key={tag} variant="secondary">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
+                        
                       </div>
                     </div>
                   </CardContent>
@@ -213,7 +201,7 @@ export default function NewsApp() {
         <section className="space-y-6 pt-8">
           <h2 className="text-xl font-bold">Editor's Picks</h2>
           <div className="grid gap-4 sm:gap-6">
-            {editorsPicks.map((article) => (
+            {editorsPicks.slice(0, 5).map((article) => (
               <Card key={article.id} className="overflow-hidden">
                 <CardContent className="p-0">
                   <div className="space-y-4">
@@ -232,19 +220,85 @@ export default function NewsApp() {
                       </Category>
                       <h3 className="font-bold title-hover">{article.article_title}</h3>
                       <p className="text-sm text-muted-foreground">{article.article_short}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {article.article_hashtags?.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="secondary">
-                           {tag}
-                          </Badge>
-                        ))}
-                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
+        </section>
+
+        {/* Additional Latest News */}
+        <section className="space-y-6 pt-8">
+          <ScrollArea className="h-[400px] sm:h-[600px] pr-2 sm:pr-4">
+            <div className="space-y-6">
+              {latestArticles.slice(5, 10).map((article) => (
+                <Card key={article.id} className="border-0 shadow-none">
+                  <CardContent className="p-0">
+                    <div className="">
+                      <Category className="text-sm" href={`/categories/${formatCategorySlug(article.article_category)}`}>
+                        {article.article_category}
+                      </Category>
+                      <div className="space-y-2">
+                        <div 
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setExpandedArticleId(prev => prev === article.id ? null : article.id)
+                            setExpandedSummaryId(null)
+                          }}
+                        >
+                          <div className="flex items-center justify-between w-full">
+                            <h3 className="font-bold title-hover">{article.article_title}</h3>
+                            {expandedArticleId === article.id ? (
+                              <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                            )}
+                          </div>
+                        </div>
+                        
+                        {expandedArticleId === article.id && (
+                          <div 
+                            className="cursor-pointer"
+                            onClick={() => setExpandedSummaryId(prev => prev === article.id ? null : article.id)}
+                          >
+                            {expandedSummaryId !== article.id && (
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm text-muted-foreground flex-1">{article.article_short}</p>
+                                <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                              </div>
+                            )}
+                            {expandedSummaryId === article.id && (
+                              <div className="flex items-center gap-2">
+                                <p className="text-muted-foreground whitespace-pre-line flex-1">
+                                  {article.article_medium}
+                                </p>
+                                <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
+                        {expandedArticleId === article.id && expandedSummaryId === article.id && (
+                          <Link 
+                            href={`/article/${article.title_slug}`}
+                            className="text-sm text-blue-600 hover:underline block"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Lexo →
+                          </Link>
+                        )}
+                      </div>
+                      <div className="flex gap-4 text-sm text-muted-foreground">
+                        <time>{new Date(article.created_at).toLocaleDateString()}</time>
+                        
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
         </section>
       </main>
       

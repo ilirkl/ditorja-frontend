@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react";
 import type { Article } from "@/types/article";
-import { CategoryArticlesSection } from "@/components/category-articles-section";
 import { getArticlesByCategory } from "@/lib/supabase";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
+import { CategoryHeader } from "@/components/category/category-header";
+import { CategoryLoading } from "@/components/category/category-loading";
+import { CategoryEmpty } from "@/components/category/category-empty";
+import { CategoryContent } from "@/components/category/category-content";
 
 export default function CategoryPage({
   params,
@@ -34,24 +37,20 @@ export default function CategoryPage({
 
   if (loading) {
     return (
-      <div className="container py-8">
-        <h1 className="text-3xl font-bold mb-8 capitalize">
-        Artikuj : {params.category_slug.replace(/-/g, " ")} 
-        </h1>
-        <p className="text-muted-foreground">Duke perpunuar...</p>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <CategoryLoading categorySlug={params.category_slug} />
+        <Footer />
       </div>
     );
   }
 
   if (articles.length === 0) {
     return (
-      <div className="container py-8">
-        <h1 className="text-3xl font-bold mb-8 capitalize">
-        Artikuj : {params.category_slug.replace(/-/g, " ")} 
-        </h1>
-        <p className="text-muted-foreground">
-          Ska artikuj.
-        </p>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <CategoryEmpty categorySlug={params.category_slug} />
+        <Footer />
       </div>
     );
   }
@@ -59,19 +58,13 @@ export default function CategoryPage({
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
-      <main className="flex-1 container py-8">
-        <h1 className="text-3xl font-bold mb-8 capitalize">
-          Kategoria : {params.category_slug.replace(/-/g, " ")} 
-        </h1>
-        
-        <CategoryArticlesSection 
-          articles={articles}
-          expandedId={expandedId}
-          setExpandedId={setExpandedId}
-        />
-      </main>
-      
+      <CategoryHeader categorySlug={params.category_slug} />
+      <CategoryContent
+        articles={articles}
+        expandedId={expandedId}
+        setExpandedId={setExpandedId}
+        categorySlug={params.category_slug}
+      />
       <Footer />
     </div>
   );
