@@ -18,24 +18,52 @@ const badgeVariants = cva(
 )
 
 interface BadgeProps 
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeVariants> {}
+  extends React.HTMLAttributes<HTMLElement>,
+    VariantProps<typeof badgeVariants> {
+  asChild?: boolean;
+}
 
-function Badge({ className, variant, ...props }: BadgeProps) {
+function Badge({ className, variant, asChild, ...props }: BadgeProps) {
+  const Comp = asChild ? 'div' : 'span';
   return (
-    <span 
+    <Comp 
       className={cn(badgeVariants({ variant }), className)} 
       {...props} 
     />
   )
 }
 
-interface CategoryProps extends React.HTMLAttributes<HTMLSpanElement> {}
+interface CategoryProps extends React.HTMLAttributes<HTMLElement> {
+  asChild?: boolean;
+  href?: string;
+}
 
-function Category({ className, ...props }: CategoryProps) {
+import Link from "next/link";
+
+function Category({ className, asChild, href, ...props }: CategoryProps) {
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className={cn(
+          "category hover:text-blue-700 hover:underline cursor-pointer transition-colors",
+          className
+        )}
+        onClick={(e) => e.stopPropagation()}
+        {...props}
+      >
+        {props.children}
+      </Link>
+    )
+  }
+  
+  const Comp = asChild ? 'div' : 'span';
   return (
-    <span 
-      className={cn("category", className)} 
+    <Comp 
+      className={cn(
+        "category hover:text-blue-700 hover:underline cursor-pointer transition-colors",
+        className
+      )} 
       {...props} 
     />
   )

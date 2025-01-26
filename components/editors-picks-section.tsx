@@ -1,9 +1,10 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { Badge, Category } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Article } from "@/types/article";
+import { formatCategorySlug } from "@/lib/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
@@ -27,9 +28,12 @@ export function EditorsPicksSection({
           <Card key={article.id} className="border-0 shadow-none">
             <CardContent className="p-0">
               <div className="space-y-4">
-                <Badge className="text-sm text-blue-600 text-transform-uppercase">
-                  {article.article_category}
-                </Badge>
+                  <Link 
+                    href={`/categories/${encodeURIComponent(formatCategorySlug(article.article_category))}`}
+                    className="text-sm hover:underline"
+                  >
+                    {article.article_category}
+                  </Link>
                 
                 <div className="space-y-2">
                   <div 

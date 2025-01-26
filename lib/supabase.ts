@@ -51,11 +51,16 @@ export async function getArticles() {
       return {
         ...article,
         article_hashtags: hashtags,
-        status: article.status || 'normal'
+        status: article.status || 'normal',
+        title_slug: article.title_slug || article.article_title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
       };
     }) as Article[]
-  } catch (error) {
-    console.error("Error fetching articles:", error.message)
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error fetching articles:", error.message)
+    } else {
+      console.error("Unexpected error fetching articles:", error)
+    }
     return []
   }
 }
@@ -80,6 +85,37 @@ export async function getArticleById(id: string) {
 
   if (error) {
     console.error("Error fetching article:", error.message)
+    return null
+  }
+
+  return {
+    ...data,
+    article_hashtags: data.article_hashtag ? data.article_hashtag.split('\n') : [],
+    status: data.status || 'normal'
+  } as Article
+}
+
+export async function getArticleBySlug(slug: string) {
+  const { data, error } = await supabase
+    .from("ditorja_frontend")
+    .select(`
+      id,
+      article_title,
+      article_short,
+      article_medium,
+      article_large,
+      article_image,
+      article_category,
+      article_hashtag,
+      created_at,
+      status,
+      title_slug
+    `)
+    .eq("title_slug", slug)
+    .single()
+
+  if (error) {
+    console.error("Error fetching article by slug:", error.message)
     return null
   }
 

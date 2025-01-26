@@ -8,6 +8,7 @@ import Link from "next/link"
 import { Navbar } from "@/components/ui/navbar"
 import { Footer } from "@/components/ui/footer"
 import { getArticles } from "@/lib/supabase"
+import { formatCategorySlug } from "@/lib/utils"
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Article } from "@/types/article"
@@ -62,8 +63,10 @@ export default function NewsApp() {
         {featuredArticle && (
           <article className="py-6">
             <div className="space-y-4">
-              <Category className="text-sm">{featuredArticle.article_category}</Category>
-              <Link href={`/article/${featuredArticle.id}`}>
+                      <Category className="text-sm" href={`/categories/${formatCategorySlug(featuredArticle.article_category)}`}>
+                        {featuredArticle.article_category}
+                      </Category>
+              <Link href={`/article/${featuredArticle.title_slug}`}>
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight title-hover">{featuredArticle.article_title}</h1>
               </Link>
               <Image
@@ -101,7 +104,7 @@ export default function NewsApp() {
                 </div>
                 {expandedArticleId === featuredArticle.id && expandedSummaryId === featuredArticle.id && (
                   <Link 
-                    href={`/article/${featuredArticle.id}`}
+                    href={`/article/${featuredArticle.title_slug}`}
                     className="text-sm text-blue-600 hover:underline block"
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -135,7 +138,9 @@ export default function NewsApp() {
                 <Card key={article.id} className="border-0 shadow-none">
                   <CardContent className="p-0">
                     <div className="">
-                      <Category className="text-sm">{article.article_category}</Category>
+                      <Category className="text-sm" href={`/categories/${formatCategorySlug(article.article_category)}`}>
+                        {article.article_category}
+                      </Category>
                       <div className="space-y-2">
                         <div 
                           className="cursor-pointer"
@@ -178,7 +183,7 @@ export default function NewsApp() {
                         
                         {expandedArticleId === article.id && expandedSummaryId === article.id && (
                           <Link 
-                            href={`/article/${article.id}`}
+                            href={`/article/${article.title_slug}`}
                             className="text-sm text-blue-600 hover:underline block"
                             onClick={(e) => e.stopPropagation()}
                           >
@@ -211,16 +216,20 @@ export default function NewsApp() {
             {editorsPicks.map((article) => (
               <Card key={article.id} className="overflow-hidden">
                 <CardContent className="p-0">
-                  <Link href={`/article/${article.id}`} className="space-y-4">
-                    <Image
-                      src={article.article_image || "/placeholder.svg"}
-                      alt={article.article_title}
-                      width={600}
-                      height={300}
-                      className="object-cover w-full h-auto"
-                    />
+                  <div className="space-y-4">
+                    <Link href={`/article/${article.title_slug}`}>
+                      <Image
+                        src={article.article_image || "/placeholder.svg"}
+                        alt={article.article_title}
+                        width={600}
+                        height={300}
+                        className="object-cover w-full h-auto"
+                      />
+                    </Link>
                     <div className="p-4 space-y-2">
-                      <Category className="text-sm">{article.article_category}</Category>
+                      <Category className="text-sm" href={`/categories/${formatCategorySlug(article.article_category)}`}>
+                        {article.article_category}
+                      </Category>
                       <h3 className="font-bold title-hover">{article.article_title}</h3>
                       <p className="text-sm text-muted-foreground">{article.article_short}</p>
                       <div className="flex flex-wrap gap-2">
@@ -231,7 +240,7 @@ export default function NewsApp() {
                         ))}
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 </CardContent>
               </Card>
             ))}

@@ -1,4 +1,4 @@
-import { getArticleById } from "@/lib/supabase"
+import { getArticleBySlug } from "@/lib/supabase"
 import { notFound } from "next/navigation"
 import { Navbar } from "@/components/ui/navbar"
 import { Footer } from "@/components/ui/footer"
@@ -10,9 +10,9 @@ import { ArticleContent } from "@/components/article/article-content"
 export default async function ArticlePage({
   params,
 }: {
-  params: { id: string }
+  params: { slug: string }
 }) {
-  const article = await getArticleById(params.id)
+  const article = await getArticleBySlug(params.slug)
 
   if (!article) {
     notFound()

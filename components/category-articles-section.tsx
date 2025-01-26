@@ -9,7 +9,7 @@ import { formatCategorySlug } from "@/lib/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
-export function LatestNewsSection({ 
+export function CategoryArticlesSection({ 
   articles,
   expandedId,
   setExpandedId
@@ -22,25 +22,13 @@ export function LatestNewsSection({
 
   return (
     <section className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-sohne-semibold">Te Fundit</h2>
-        <Link href="/articles" className="text-sm text-blue-600 hover:underline">
-          ALL STORIES →
-        </Link>
-      </div>
-
       <ScrollArea className="h-[400px] sm:h-[600px] pr-2 sm:pr-4">
         <div className="space-y-6">
           {articles.map((article) => (
             <Card key={article.id} className="border-0 shadow-none">
               <CardContent className="p-0">
                 <div className="space-y-2">
-                  <Category 
-                    href={`/categories/${encodeURIComponent(formatCategorySlug(article.article_category))}`}
-                    className="text-sm hover:bg-gray-100 transition-colors"
-                  >
-                    {article.article_category}
-                  </Category>
+                  
                   <div className="space-y-2">
                     <div 
                       className="cursor-pointer"
@@ -87,7 +75,7 @@ export function LatestNewsSection({
                         className="text-sm text-blue-600 hover:underline block"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        Read more →
+                        Lexo →
                       </Link>
                     )}
                   </div>

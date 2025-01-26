@@ -9,4 +9,5 @@ export type Article = {
   article_hashtags: string[]
   created_at: string
   status: "featured" | "normal" | "editors"
+  title_slug: string
 }

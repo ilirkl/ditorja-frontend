@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Article } from "@/types/article";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { formatCategorySlug } from "@/lib/utils";
 
 export function FeaturedArticle({ 
   article,
@@ -21,9 +22,11 @@ export function FeaturedArticle({
   return (
     <article className="py-6">
       <div className="space-y-4">
-        <Category className="text-sm">
-          {article.article_category}
-        </Category>
+        <Link href={`/categories/${encodeURIComponent(formatCategorySlug(article.article_category))}`}>
+          <Category className="text-sm hover:underline">
+            {article.article_category}
+          </Category>
+        </Link>
         <Link href={`/article/${article.id}`}>
           <h1 className="text-xl sm:text-2xl tracking-tight title-hover font-sohne-bold">
             {article.article_title}
