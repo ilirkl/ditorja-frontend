@@ -22,7 +22,7 @@ export function FeaturedArticle({
   return (
     <article className="py-6">
       <div className="space-y-4">
-        <Link href={`/categories/${encodeURIComponent(formatCategorySlug(article.article_category))}`}>
+        <Link href={`/categories/${encodeURIComponent(formatCategorySlug(article.article_category, article.category_slug))}`}>
           <Category className="text-sm hover:underline">
             {article.article_category}
           </Category>

@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import type { Article } from "@/types/article";
 import { CategoryArticlesSection } from "@/components/category-articles-section";
-import { getArticlesByCategory } from "@/lib/utils";
+import { getArticlesByCategory } from "@/lib/supabase";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 
 export default function CategoryPage({
   params,
 }: {
-  params: { category: string };
+  params: { category_slug: string };
 }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
@@ -19,9 +19,9 @@ export default function CategoryPage({
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const data = await getArticlesByCategory(params.category);
+        const data = await getArticlesByCategory(params.category_slug.toLowerCase());
         setArticles(data);
-        console.log(`Fetched ${data.length} articles for category: ${params.category}`);
+        console.log(`Fetched ${data.length} articles for category: ${params.category_slug}`);
       } catch (error) {
         console.error('Error fetching articles:', error);
       } finally {
@@ -30,13 +30,13 @@ export default function CategoryPage({
     };
     
     fetchArticles();
-  }, [params.category]);
+  }, [params.category_slug]);
 
   if (loading) {
     return (
       <div className="container py-8">
         <h1 className="text-3xl font-bold mb-8 capitalize">
-        Artikuj : {params.category.replace(/-/g, " ")} 
+        Artikuj : {params.category_slug.replace(/-/g, " ")} 
         </h1>
         <p className="text-muted-foreground">Duke perpunuar...</p>
       </div>
@@ -47,7 +47,7 @@ export default function CategoryPage({
     return (
       <div className="container py-8">
         <h1 className="text-3xl font-bold mb-8 capitalize">
-        Artikuj : {params.category.replace(/-/g, " ")} 
+        Artikuj : {params.category_slug.replace(/-/g, " ")} 
         </h1>
         <p className="text-muted-foreground">
           Ska artikuj.
@@ -62,7 +62,7 @@ export default function CategoryPage({
       
       <main className="flex-1 container py-8">
         <h1 className="text-3xl font-bold mb-8 capitalize">
-          Kategoria : {params.category.replace(/-/g, " ")} 
+          Kategoria : {params.category_slug.replace(/-/g, " ")} 
         </h1>
         
         <CategoryArticlesSection 

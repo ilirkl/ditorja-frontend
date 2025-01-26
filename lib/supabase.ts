@@ -18,18 +18,20 @@ export async function getArticles() {
   try {
     const { data, error } = await supabase
       .from("ditorja_frontend")
-      .select(`
-        id,
-        article_title,
-        article_short,
-        article_medium,
-        article_large,
-        article_image,
-        article_category,
-        article_hashtag,
-        created_at,
-        status
-      `)
+    .select(`
+      id,
+      article_title,
+      article_short,
+      article_medium,
+      article_large,
+      article_image,
+      article_category,
+      category_slug,
+      article_hashtag,
+      created_at,
+      status,
+      title_slug
+    `)
       .order("created_at", { ascending: false })
       .limit(10)
       
@@ -48,11 +50,21 @@ export async function getArticles() {
       const hashtags = article.article_hashtags || 
         (article.article_hashtag ? article.article_hashtag.split('\n') : []);
       
+      // Normalize category slug to ensure consistency
+      const normalizedCategorySlug = article.category_slug || 
+        article.article_category
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+
       return {
         ...article,
         article_hashtags: hashtags,
         status: article.status || 'normal',
-        title_slug: article.title_slug || article.article_title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+        title_slug: article.title_slug || article.article_title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        category_slug: normalizedCategorySlug
       };
     }) as Article[]
   } catch (error: unknown) {
@@ -76,9 +88,11 @@ export async function getArticleById(id: string) {
       article_large,
       article_image,
       article_category,
+      category_slug,
       article_hashtag,
       created_at,
-      status
+      status,
+      title_slug
     `)
     .eq("id", id)
     .single()
@@ -91,37 +105,94 @@ export async function getArticleById(id: string) {
   return {
     ...data,
     article_hashtags: data.article_hashtag ? data.article_hashtag.split('\n') : [],
-    status: data.status || 'normal'
+    status: data.status || 'normal',
+    title_slug: data.title_slug || data.article_title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
   } as Article
 }
 
-export async function getArticleBySlug(slug: string) {
-  const { data, error } = await supabase
-    .from("ditorja_frontend")
-    .select(`
-      id,
-      article_title,
-      article_short,
-      article_medium,
-      article_large,
-      article_image,
-      article_category,
-      article_hashtag,
-      created_at,
-      status,
-      title_slug
-    `)
-    .eq("title_slug", slug)
-    .single()
+export async function getArticlesByCategory(categorySlug: string) {
+  try {
+    const { data, error } = await supabase
+      .from("ditorja_frontend")
+      .select(`
+        id,
+        article_title,
+        article_short,
+        article_medium,
+        article_large,
+        article_image,
+        article_category,
+        category_slug,
+        article_hashtag,
+        created_at,
+        status,
+        title_slug
+      `)
+      .eq('category_slug', categorySlug)
+      .order("created_at", { ascending: false })
 
-  if (error) {
-    console.error("Error fetching article by slug:", error.message)
+    if (error) {
+      console.error("Error fetching articles by category:", error.message)
+      return []
+    }
+
+    return data.map((article: any) => ({
+      ...article,
+      article_hashtags: article.article_hashtag ? article.article_hashtag.split('\n') : [],
+      status: article.status || 'normal',
+      title_slug: article.title_slug || article.article_title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    })) as Article[]
+  } catch (error) {
+    console.error("Unexpected error fetching articles by category:", error)
+    return []
+  }
+}
+
+export async function getArticleBySlug(slug: string | undefined) {
+  if (!slug) {
+    console.error("Invalid slug provided:", slug)
     return null
   }
 
-  return {
-    ...data,
-    article_hashtags: data.article_hashtag ? data.article_hashtag.split('\n') : [],
-    status: data.status || 'normal'
-  } as Article
+  try {
+    const { data, error } = await supabase
+      .from("ditorja_frontend")
+      .select(`
+        id,
+        article_title,
+        article_short,
+        article_medium,
+        article_large,
+        article_image,
+        article_category,
+        category_slug,
+        article_hashtag,
+        created_at,
+        status,
+        title_slug
+      `)
+      .eq("title_slug", slug)
+      .limit(1)
+      .maybeSingle()
+
+    if (error) {
+      console.error("Error fetching article by slug:", error.message)
+      return null
+    }
+
+    if (!data) {
+      console.error("No article found with slug:", slug)
+      return null
+    }
+
+    return {
+      ...data,
+      article_hashtags: data.article_hashtag ? data.article_hashtag.split('\n') : [],
+      status: data.status || 'normal',
+      category_slug: data.category_slug
+    } as Article
+  } catch (error) {
+    console.error("Unexpected error fetching article by slug:", error)
+    return null
+  }
 }

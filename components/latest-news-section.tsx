@@ -36,7 +36,7 @@ export function LatestNewsSection({
               <CardContent className="p-0">
                 <div className="space-y-2">
                   <Category 
-                    href={`/categories/${encodeURIComponent(formatCategorySlug(article.article_category))}`}
+                    href={`/categories/${article.category_slug}`}
                     className="text-sm hover:bg-gray-100 transition-colors"
                   >
                     {article.article_category}

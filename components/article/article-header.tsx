@@ -6,7 +6,7 @@ export function ArticleHeader({
   title,
   date,
 }: {
-  category: string
+  category: { slug: string, name: string }
   title: string
   date: string
 }) {
@@ -16,7 +16,9 @@ export function ArticleHeader({
         ← Kthehu
       </Link>
       <div>
-        <Category className="text-sm mb-2">{category}</Category>
+        <Link href={`/category/${category.slug}`}>
+          <Category className="text-sm mb-2">{category.name}</Category>
+        </Link>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl mb-2">{title}</h1>
         <div className="text-sm text-muted-foreground">
           <time>{date}</time>

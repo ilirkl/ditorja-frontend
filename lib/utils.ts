@@ -68,15 +68,20 @@ function getCurrentMappings(): CategoryMapping[] {
   return categoryCache.mappings;
 }
 
-export function formatCategorySlug(category: string): string {
-  // Find matching mapping or create a default slug
+export function formatCategorySlug(category: string, category_slug?: string): string {
+  // Use the provided category_slug if available
+  if (category_slug) {
+    return category_slug;
+  }
+  
+  // Fallback to existing mapping or default slug generation
   const mapping = getCurrentMappings().find(m => m.dbName === category);
   return mapping ? mapping.slug : category
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim();
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .replace(/[^a-z0-9]+/g, '-') // Replace special chars with hyphens
+    .replace(/(^-|-$)/g, ''); // Remove leading/trailing hyphens
 }
 
 export function formatCategoryForQuery(slug: string): string {

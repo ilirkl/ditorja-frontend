@@ -10,9 +10,9 @@ import { ArticleContent } from "@/components/article/article-content"
 export default async function ArticlePage({
   params,
 }: {
-  params: { slug: string }
+  params: { id: string }
 }) {
-  const article = await getArticleBySlug(params.slug)
+  const article = await getArticleBySlug(params.id)
 
   if (!article) {
     notFound()
@@ -24,7 +24,10 @@ export default async function ArticlePage({
       <div className="container max-w-3xl px-4 py-6">
         <article className="space-y-2">
           <ArticleHeader
-            category={article.article_category}
+            category={{
+              slug: article.article_category.toLowerCase().replace(/\s+/g, '-'),
+              name: article.article_category
+            }}
             title={article.article_title}
             date={new Date(article.created_at).toLocaleDateString()}
           />
