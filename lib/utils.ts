@@ -1,3 +1,4 @@
+// utils.ts
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { supabase } from "./supabase"
@@ -7,107 +8,34 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-interface CategoryMapping {
-  slug: string;
-  dbName: string;
-}
+// Remove all category cache-related code and interfaces
 
-interface CategoryCache {
-  mappings: CategoryMapping[];
-  lastUpdated: number;
-}
-
-const CATEGORY_CACHE_TTL = 1000 * 60 * 5; // 5 minutes
-let categoryCache: CategoryCache | null = null;
-
-async function fetchCategoriesWithRetry(retries = 3): Promise<CategoryMapping[]> {
-  try {
-    const { data, error } = await supabase
-      .from("categories") // Assuming a dedicated categories table exists
-      .select("*")
-      .order("name", { ascending: true });
-
-    if (error) throw error;
-
-    return data.map(category => ({
-      slug: formatCategorySlug(category.name),
-      dbName: category.name
-    }));
-  } catch (error) {
-    if (retries > 0) {
-      console.warn(`Retrying category fetch (${retries} retries left)`);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return fetchCategoriesWithRetry(retries - 1);
-    }
-    throw error;
-  }
-}
-
-async function refreshCategoryCache() {
-  try {
-    const mappings = await fetchCategoriesWithRetry();
-    categoryCache = {
-      mappings,
-      lastUpdated: Date.now()
-    };
-  } catch (error) {
-    console.error("Failed to refresh category cache:", error);
-  }
-}
-
-// Initialize cache and setup background refresh
-refreshCategoryCache();
-setInterval(refreshCategoryCache, CATEGORY_CACHE_TTL);
-
-function getCurrentMappings(): CategoryMapping[] {
-  if (!categoryCache || Date.now() - categoryCache.lastUpdated > CATEGORY_CACHE_TTL) {
-    // If cache is stale, refresh synchronously
-    refreshCategoryCache();
-    return categoryCache?.mappings || [];
-  }
-  return categoryCache.mappings;
-}
-
-export function formatCategorySlug(category: string, category_slug?: string): string {
-  // Use the provided category_slug if available
-  if (category_slug) {
-    return category_slug;
-  }
-  
-  // Fallback to existing mapping or default slug generation
-  const mapping = getCurrentMappings().find(m => m.dbName === category);
-  return mapping ? mapping.slug : category
+export function formatCategorySlug(category: string): string {
+  return category
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-    .replace(/[^a-z0-9]+/g, '-') // Replace special chars with hyphens
-    .replace(/(^-|-$)/g, ''); // Remove leading/trailing hyphens
+    .replace(/[^a-z0-9]+/g, '-')    // Replace special chars with hyphens
+    .replace(/(^-|-$)/g, '');       // Remove leading/trailing hyphens
 }
 
 export function formatCategoryForQuery(slug: string): string {
-  // Find matching mapping or use default conversion
-  const mapping = getCurrentMappings().find(m => m.slug === slug);
-  if (mapping) {
-    return mapping.dbName;
-  }
-  
-  // Fallback for unmapped categories
   return slug
     .replace(/-/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letters
     .trim();
 }
 
 export async function getArticlesByCategory(categorySlug: string): Promise<Article[]> {
-  // Convert URL-friendly slug to database format
-  const dbCategory = formatCategoryForQuery(categorySlug);
+  // Convert URL-friendly slug to display format
+  const displayCategory = formatCategoryForQuery(categorySlug);
   
-  console.log(`Searching for articles with category: ${dbCategory}`);
+  console.log(`Searching for articles with category: ${displayCategory}`);
 
   const { data, error } = await supabase
     .from("ditorja_frontend")
     .select("*")
-    .eq("article_category", dbCategory) // Use exact match now that we have correct format
+    .ilike("article_category", `%${displayCategory}%`) // Case-insensitive partial match
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -115,6 +43,6 @@ export async function getArticlesByCategory(categorySlug: string): Promise<Artic
     return [];
   }
 
-  console.log(`Found ${data.length} articles for category: ${dbCategory}`);
+  console.log(`Found ${data.length} articles for category: ${displayCategory}`);
   return data as Article[];
 }

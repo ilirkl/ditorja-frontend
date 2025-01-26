@@ -1,18 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { Article } from "@/types/article";
-import { getArticlesByCategory } from "@/lib/supabase";
+import { Article } from "@/types/article";
+import { getArticlesBySearch } from "@/lib/supabase";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { NewsSection } from "@/components/NewsSection";
 import { formatCategorySlug } from "@/lib/utils";
 import Link from "next/link";
 
-export default function CategoryPage({
-  params,
+export default function SearchPage({
+  searchParams,
 }: {
-  params: { category_slug: string };
+  searchParams: { q: string };
 }) {
   const [expandedArticleId, setExpandedArticleId] = useState<string | null>(null);
   const [expandedSummaryId, setExpandedSummaryId] = useState<string | null>(null);
@@ -22,24 +22,28 @@ export default function CategoryPage({
   const itemsPerPage = 10;
 
   useEffect(() => {
-    const fetchArticles = async () => {
+    const fetchResults = async () => {
       try {
-        const data = await getArticlesByCategory(params.category_slug.toLowerCase());
-        setArticles(data);
+        setLoading(true);
+        if (searchParams.q) {
+          const searchTerm = searchParams.q.trim();
+          const results = await getArticlesBySearch(searchTerm);
+          setArticles(results);
+        }
       } catch (error) {
-        console.error('Error fetching articles:', error);
+        console.error('Search error:', error);
       } finally {
         setLoading(false);
       }
     };
     
-    fetchArticles();
-  }, [params.category_slug]);
+    fetchResults();
+  }, [searchParams.q]);
 
-  // Reset to first page when category changes
+  // Reset to first page when search query changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [params.category_slug]);
+  }, [searchParams.q]);
 
   const totalPages = Math.ceil(articles.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -50,19 +54,26 @@ export default function CategoryPage({
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="container py-8">
-          <p className="text-muted-foreground">Duke perpunuar...</p>
+          <p className="text-muted-foreground">Duke kërkuar për "{searchParams.q}"...</p>
         </div>
         <Footer />
       </div>
     );
   }
 
-  if (!articles || articles.length === 0) {
+  if (!searchParams.q || articles.length === 0) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="container py-8">
-          <p className="text-muted-foreground">Ska artikuj.</p>
+          <h2 className="text-xl">
+            {searchParams.q 
+              ? `Nuk u gjet asnjë rezultat për "${searchParams.q}"`
+              : "Shkruani një term kërkimi për të filluar"}
+          </h2>
+          <Link href="/" className="text-sm text-blue-600 hover:underline mt-4 inline-block">
+            ← Kthehu në faqen kryesore
+          </Link>
         </div>
         <Footer />
       </div>
@@ -75,25 +86,25 @@ export default function CategoryPage({
       <main className="container px-4 py-2">
         <div className="mb-4">
           <div className="py-2 ml-4">
-            <h1 className="text-2xl font-bold mb-2 capitalize">
-              Kategoria: {formatCategorySlug(params.category_slug)}
+            <h1 className="text-2xl font-bold mb-2">
+              Rezultatet e kërkimit për: "{searchParams.q}"
             </h1>
             <Link href="/" className="text-sm text-blue-600 hover:underline">
               ← Kthehu në faqen kryesore
             </Link>
           </div>
         </div>
-
-        <NewsSection
-          articles={articles}
-          start={startIndex}
-          end={endIndex}
-          expandedArticleId={expandedArticleId}
-          expandedSummaryId={expandedSummaryId}
-          setExpandedArticleId={setExpandedArticleId}
-          setExpandedSummaryId={setExpandedSummaryId}
-          showViewAll={false}
-        />
+          <NewsSection
+            articles={articles}
+            start={startIndex}
+            end={endIndex}
+            expandedArticleId={expandedArticleId}
+            expandedSummaryId={expandedSummaryId}
+            setExpandedArticleId={setExpandedArticleId}
+            setExpandedSummaryId={setExpandedSummaryId}
+            showViewAll={false}
+            isSearchResult={true}
+          />
 
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center items-center gap-4">
