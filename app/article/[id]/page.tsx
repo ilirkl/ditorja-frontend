@@ -1,4 +1,4 @@
-import { getArticleBySlug } from "@/lib/supabase"
+import { getArticleBySlug, getRelatedArticles } from "@/lib/supabase"
 import { notFound } from "next/navigation"
 import { Navbar } from "@/components/ui/navbar"
 import { Footer } from "@/components/ui/footer"
@@ -17,6 +17,8 @@ export default async function ArticlePage({
   if (!article) {
     notFound()
   }
+
+  const relatedArticles = await getRelatedArticles(article)
 
   return (
     <>
@@ -37,8 +39,25 @@ export default async function ArticlePage({
           />
           <ArticleContent content={article.article_large} />
           <ArticleTags tags={article.article_hashtags} />
-
         </article>
+
+        {relatedArticles.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold mb-6">Artikuj të ngjashëm</h2>
+            <div className="space-y-8">
+              {relatedArticles.map((relatedArticle) => (
+                <FeaturedNews
+                  key={relatedArticle.id}
+                  article={relatedArticle}
+                  expandedArticleId={null}
+                  expandedSummaryId={null}
+                  setExpandedArticleId={() => {}}
+                  setExpandedSummaryId={() => {}}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       <Footer />
     </>

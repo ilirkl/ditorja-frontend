@@ -217,3 +217,42 @@ export function formatCategoryForQuery(slug: string): string {
     .replace(/\b\w/g, (char) => char.toUpperCase())
     .trim();
 }
+
+export async function getRelatedArticles(currentArticle: Article, limit = 3): Promise<Article[]> {
+  if (!currentArticle.article_hashtags || currentArticle.article_hashtags.length === 0) {
+    return [];
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("ditorja_frontend")
+      .select(`
+        id,
+        article_title,
+        article_short,
+        article_medium,
+        article_large,
+        article_image,
+        article_category,
+        category_slug,
+        article_hashtag,
+        created_at,
+        status,
+        title_slug
+      `)
+      .neq('id', currentArticle.id) // Exclude current article
+      .filter('article_hashtag', 'ilike', `%${currentArticle.article_hashtags[0]}%`) // Match first hashtag
+      .limit(limit)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("Error fetching related articles:", error.message);
+      return [];
+    }
+
+    return data.map(processArticle) as Article[];
+  } catch (error) {
+    console.error("Unexpected error fetching related articles:", error);
+    return [];
+  }
+}
