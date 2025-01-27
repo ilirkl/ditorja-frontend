@@ -6,6 +6,8 @@ import { ArticleHeader } from "@/components/article/article-header"
 import { ArticleImage } from "@/components/article/article-image"
 import { ArticleTags } from "@/components/article/article-tags"
 import { ArticleContent } from "@/components/article/article-content"
+import { FeaturedNews } from "@/components/FeaturedNews";
+
 
 export default async function ArticlePage({
   params,
