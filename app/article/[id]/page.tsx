@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { Navbar } from "@/components/ui/navbar"
 import { Footer } from "@/components/ui/footer"
 import { ArticleHeader } from "@/components/article/article-header"
-import { ArticleImage } from "@/components/ui/article-image"
+import { ArticleImage } from "@/components/article/article-image"
 import { ArticleTags } from "@/components/article/article-tags"
 import { ArticleContent } from "@/components/article/article-content"
 
@@ -35,8 +35,9 @@ export default async function ArticlePage({
             src={article.article_image}
             alt={article.article_title}
           />
-          <ArticleTags tags={article.article_hashtags} />
           <ArticleContent content={article.article_large} />
+          <ArticleTags tags={article.article_hashtags} />
+
         </article>
       </div>
       <Footer />

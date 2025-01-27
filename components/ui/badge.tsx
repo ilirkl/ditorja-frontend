@@ -9,6 +9,7 @@ const badgeVariants = cva(
       variant: {
         default: "bg-blue-100 text-blue-800",
         secondary: "text-sm text-blue-600 text-transform-uppercase",
+        third: "inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-800 ring-blue-700/10 ring-inset",
       },
     },
     defaultVariants: {
