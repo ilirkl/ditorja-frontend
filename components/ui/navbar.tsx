@@ -1,26 +1,27 @@
 "use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Menu, Search, X } from "lucide-react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import type { SearchBoxProps } from "@/components/search/types";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Menu, Search, X } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import type { SearchBoxProps } from "@/types/search.ts";
 
 export function Navbar({ onSearch }: SearchBoxProps) {
-  const [showSearch, setShowSearch] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const router = useRouter()
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
-      setShowSearch(false)
-      setSearchQuery("")
+      onSearch?.(searchQuery.trim()); // Use optional chaining here
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setShowSearch(false);
+      setSearchQuery("");
     }
-  }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -55,8 +56,8 @@ export function Navbar({ onSearch }: SearchBoxProps) {
                   variant="ghost"
                   size="icon"
                   onClick={() => {
-                    setShowSearch(false)
-                    setSearchQuery("")
+                    setShowSearch(false);
+                    setSearchQuery("");
                   }}
                 >
                   <X className="h-5 w-5" />
@@ -79,5 +80,5 @@ export function Navbar({ onSearch }: SearchBoxProps) {
         </div>
       </div>
     </header>
-  )
+  );
 }

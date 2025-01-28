@@ -1,37 +1,53 @@
-import { createClient } from "@supabase/supabase-js"
-import type { Article } from "@/types/article"
+import { createClient } from "@supabase/supabase-js";
+import type { Article } from "@/types/article";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
   db: {
-    schema: 'public'
+    schema: "public",
   },
   auth: {
     persistSession: true,
-    autoRefreshToken: true
-  }
-})
+    autoRefreshToken: true,
+  },
+});
 
 // Helper function for slug generation
 function slugify(text: string) {
   return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+// Type for raw article input from Supabase
+interface ArticleInput {
+  id: string;
+  article_title: string;
+  article_short: string;
+  article_medium: string;
+  article_large: string;
+  article_image: string;
+  article_category: string;
+  category_slug?: string;
+  article_hashtag?: string;
+  created_at: string;
+  status?: "featured" | "normal" | "editors";  // Restrict status to specific values
+  title_slug?: string;
 }
 
 // Unified article processing
-function processArticle(article: any): Article {
+function processArticle(article: ArticleInput): Article {
   return {
     ...article,
-    article_hashtags: article.article_hashtag?.split('\n') || [],
-    status: article.status || 'normal',
+    article_hashtags: article.article_hashtag?.split("\n") || [],
+    status: article.status || "normal",
     title_slug: article.title_slug || slugify(article.article_title),
-    category_slug: article.category_slug || slugify(article.article_category)
+    category_slug: article.category_slug || slugify(article.article_category),
   };
 }
 
@@ -54,17 +70,17 @@ export async function getArticles() {
         title_slug
       `)
       .order("created_at", { ascending: false })
-      .limit(10)
+      .limit(10);
 
     if (error) {
-      console.error("Error fetching articles:", error.message)
-      return []
+      console.error("Error fetching articles:", error.message);
+      return [];
     }
 
-    return data.map(processArticle) as Article[]
+    return data.map(processArticle) as Article[];
   } catch (error: unknown) {
-    console.error("Unexpected error fetching articles:", error)
-    return []
+    console.error("Unexpected error fetching articles:", error);
+    return [];
   }
 }
 
@@ -86,14 +102,14 @@ export async function getArticleById(id: string) {
       title_slug
     `)
     .eq("id", id)
-    .single()
+    .single();
 
   if (error) {
-    console.error("Error fetching article:", error.message)
-    return null
+    console.error("Error fetching article:", error.message);
+    return null;
   }
 
-  return processArticle(data)
+  return processArticle(data as ArticleInput);
 }
 
 export async function getArticlesByCategory(categorySlug: string) {
@@ -114,26 +130,26 @@ export async function getArticlesByCategory(categorySlug: string) {
         status,
         title_slug
       `)
-      .ilike('category_slug', `%${categorySlug}%`)
-      .order("created_at", { ascending: false })
+      .ilike("category_slug", `%${categorySlug}%`)
+      .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching articles by category:", error.message)
-      return []
+      console.error("Error fetching articles by category:", error.message);
+      return [];
     }
 
-    return data.map(processArticle) as Article[]
+    return data.map(processArticle) as Article[];
   } catch (error) {
-    console.error("Unexpected error fetching articles by category:", error)
-    return []
+    console.error("Unexpected error fetching articles by category:", error);
+    return [];
   }
 }
 
 export async function getArticlesBySearch(query: string): Promise<Article[]> {
   try {
     const normalizedQuery = query
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
 
     const { data, error } = await supabase
@@ -152,7 +168,9 @@ export async function getArticlesBySearch(query: string): Promise<Article[]> {
         status,
         title_slug
       `)
-      .or(`article_title.ilike.%${normalizedQuery}%,article_short.ilike.%${normalizedQuery}%,article_medium.ilike.%${normalizedQuery}%`)
+      .or(
+        `article_title.ilike.%${normalizedQuery}%,article_short.ilike.%${normalizedQuery}%,article_medium.ilike.%${normalizedQuery}%`
+      )
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -169,8 +187,8 @@ export async function getArticlesBySearch(query: string): Promise<Article[]> {
 
 export async function getArticleBySlug(slug: string | undefined) {
   if (!slug) {
-    console.error("Invalid slug provided:", slug)
-    return null
+    console.error("Invalid slug provided:", slug);
+    return null;
   }
 
   try {
@@ -191,29 +209,16 @@ export async function getArticleBySlug(slug: string | undefined) {
         title_slug
       `)
       .eq("title_slug", slug)
-      .limit(1)
-      .maybeSingle()
+      .single();
 
     if (error) {
-      console.error("Error fetching article by slug:", error.message)
-      return null
+      console.error("Error fetching article by slug:", error.message);
+      return null;
     }
 
-    return data ? processArticle(data) : null;
+    return processArticle(data as ArticleInput);
   } catch (error) {
-    console.error("Unexpected error fetching article by slug:", error)
-    return null
+    console.error("Unexpected error fetching article by slug:", error);
+    return null;
   }
-}
-
-// Simplified category formatting functions
-export function formatCategorySlug(category: string): string {
-  return slugify(category);
-}
-
-export function formatCategoryForQuery(slug: string): string {
-  return slug
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase())
-    .trim();
 }

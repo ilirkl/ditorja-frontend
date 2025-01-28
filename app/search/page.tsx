@@ -6,7 +6,6 @@ import { getArticlesBySearch } from "@/lib/supabase";
 import { Navbar } from "@/components/ui/navbar";
 import { Footer } from "@/components/ui/footer";
 import { NewsSection } from "@/components/NewsSection";
-import { formatCategorySlug } from "@/lib/utils";
 import Link from "next/link";
 
 export default function SearchPage({
@@ -54,7 +53,7 @@ export default function SearchPage({
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="container py-8">
-          <p className="text-muted-foreground">Duke kërkuar për "{searchParams.q}"...</p>
+          <p className="text-muted-foreground">Duke kërkuar për  &quot;{searchParams.q}&quot;...</p>
         </div>
         <Footer />
       </div>
@@ -87,7 +86,7 @@ export default function SearchPage({
         <div className="mb-4">
           <div className="py-2 ml-4">
             <h1 className="text-2xl font-bold mb-2">
-              Rezultatet e kërkimit për: "{searchParams.q}"
+              Rezultatet e kërkimit për:  &quot;{searchParams.q}&quot;
             </h1>
             <Link href="/" className="text-sm text-blue-600 hover:underline">
               ← Kthehu në faqen kryesore

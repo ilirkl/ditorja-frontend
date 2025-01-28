@@ -33,6 +33,6 @@ export type SearchResults = {
 
 // Search box props (for your navbar search)
 export type SearchBoxProps = {
-  onSearch: (query: string) => void;
+  onSearch?: (query: string) => void;
   initialQuery?: string;
 };

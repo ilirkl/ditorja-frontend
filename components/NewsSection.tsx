@@ -18,7 +18,8 @@ export const NewsSection = ({
   expandedSummaryId,
   setExpandedArticleId,
   setExpandedSummaryId,
-  showViewAll = true
+  showViewAll = true,
+  isSearchResult = false, // Add the prop here with a default value
 }: {
   title?: string;
   articles: Article[];
@@ -29,6 +30,7 @@ export const NewsSection = ({
   setExpandedArticleId: Dispatch<SetStateAction<string | null>>;
   setExpandedSummaryId: Dispatch<SetStateAction<string | null>>;
   showViewAll?: boolean;
+  isSearchResult?: boolean; // Add the new prop type
 }) => (
   <section className="space-y-6">
     {title && (
@@ -40,6 +42,12 @@ export const NewsSection = ({
           </Link>
         )}
       </div>
+    )}
+
+    {isSearchResult && (
+      <p className="text-muted-foreground italic">
+        These articles are the results of your search.
+      </p>
     )}
 
     <div className="space-y-6">
