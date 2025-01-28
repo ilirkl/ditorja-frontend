@@ -44,7 +44,7 @@ interface ArticleInput {
 function processArticle(article: ArticleInput): Article {
   return {
     ...article,
-    article_hashtags: article.article_hashtag?.split("\n") || [],
+    article_hashtag: article.article_hashtag ? article.article_hashtag.split("\n") : [],
     status: article.status || "normal",
     title_slug: article.title_slug || slugify(article.article_title),
     category_slug: article.category_slug || slugify(article.article_category),
@@ -220,5 +220,49 @@ export async function getArticleBySlug(slug: string | undefined) {
   } catch (error) {
     console.error("Unexpected error fetching article by slug:", error);
     return null;
+  }
+}
+
+export async function getRelatedArticles(currentArticle: Article, limit = 3): Promise<Article[]> {
+  if (!currentArticle.article_hashtag || currentArticle.article_hashtag.length === 0) {
+    console.log("No hashtags found on the current article.");
+    return [];
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("ditorja_frontend")
+      .select(
+        `id,
+        article_title,
+        article_short,
+        article_medium,
+        article_large,
+        article_image,
+        article_category,
+        category_slug,
+        article_hashtag,
+        created_at,
+        status,
+        title_slug`
+      )
+      .neq('id', currentArticle.id) // Exclude current article
+      .filter('article_hashtag', 'ilike', `%${currentArticle.article_hashtag}%`) // Match the hashtag
+      .limit(limit)
+      .order('created_at', { ascending: false });
+
+    // Log the response
+    if (data) {
+      console.log("Related articles data:", data);
+    }
+    if (error) {
+      console.error("Error fetching related articles:", error.message);
+      return [];
+    }
+
+    return data.map(processArticle) as Article[];
+  } catch (error) {
+    console.error("Unexpected error fetching related articles:", error);
+    return [];
   }
 }

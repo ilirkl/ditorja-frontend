@@ -7,7 +7,7 @@ export type Article = {
   article_image: string
   article_category: string
   category_slug: string
-  article_hashtags: string[]
+  article_hashtag: string[]
   created_at: string
   status: "featured" | "normal" | "editors"
   title_slug: string

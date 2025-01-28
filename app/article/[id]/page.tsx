@@ -1,4 +1,4 @@
-import { getArticleBySlug } from "@/lib/supabase"
+import { getArticleBySlug, getRelatedArticles  } from "@/lib/supabase"
 import { notFound } from "next/navigation"
 import { Navbar } from "@/components/ui/navbar"
 import { Footer } from "@/components/ui/footer"
@@ -6,6 +6,7 @@ import { ArticleHeader } from "@/components/article/article-header"
 import { ArticleImage } from "@/components/article/article-image"
 import { ArticleTags } from "@/components/article/article-tags"
 import { ArticleContent } from "@/components/article/article-content"
+import { NewsSection } from "@/components/NewsSection"
 
 export default async function ArticlePage({
   params,
@@ -17,6 +18,9 @@ export default async function ArticlePage({
   if (!article) {
     notFound();
   };
+
+  const relatedArticles = await getRelatedArticles(article)
+
 
   return (
     <>
@@ -35,8 +39,29 @@ export default async function ArticlePage({
             src={article.article_image}
             alt={article.article_title}
           />
-          <ArticleTags tags={article.article_hashtags} />
+         
           <ArticleContent content={article.article_large} />
+          <ArticleTags tags={article.article_hashtag} />
+       
+          {relatedArticles.length > 0 && (
+            <div className="mt-12">
+              <h2 className="text-2xl font-bold mb-6">Artikuj të ngjashëm</h2>
+              <div className="space-y-8">
+                {relatedArticles.map((relatedArticle) => (
+                  <NewsSection
+                    key={relatedArticle.id}
+                    articles={[relatedArticle]} // Pass as an array if needed
+                    start={0} // Specify a starting index
+                    end={1} // Specify an ending index (1 article in this case)
+                    expandedArticleId={null}
+                    expandedSummaryId={null}
+                    setExpandedArticleId={() => {}}
+                    setExpandedSummaryId={() => {}}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </article>
       </div>
       <Footer />
