@@ -16,11 +16,6 @@ export default async function ArticlePage({
 
   if (!article) {
     notFound();
-  }
-
-  const handleSearch = (query: string) => {
-    console.log(`Search query: ${query}`);
-    // You can add additional logic here if needed
   };
 
   return (
