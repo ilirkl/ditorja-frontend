@@ -24,7 +24,7 @@ export function Navbar({ onSearch }: SearchBoxProps) {
         setLoading(true);
         const fetchedCategories = await getCategories();
         setCategories(fetchedCategories);
-      } catch (err) {
+      } catch { 
         setError("Gabim gjatë ngarkimit të kategorive.");
       } finally {
         setLoading(false);

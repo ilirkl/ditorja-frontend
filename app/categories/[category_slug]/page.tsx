@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import type { Article } from "@/types/article";
 import { getArticlesByCategory } from "@/lib/supabase";
@@ -14,8 +13,6 @@ export default function CategoryPage({
 }: {
   params: { category_slug: string };
 }) {
-  const [expandedArticleId, setExpandedArticleId] = useState<string | null>(null);
-  const [expandedSummaryId, setExpandedSummaryId] = useState<string | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,12 +24,12 @@ export default function CategoryPage({
         const data = await getArticlesByCategory(params.category_slug.toLowerCase());
         setArticles(data);
       } catch (error) {
-        console.error('Error fetching articles:', error);
+        console.error("Error fetching articles:", error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchArticles();
   }, [params.category_slug]);
 
@@ -83,34 +80,27 @@ export default function CategoryPage({
             </Link>
           </div>
         </div>
-
         <NewsSection
-          articles={articles}
+          articles={articles} // Pass only static data
           start={startIndex}
           end={endIndex}
-          expandedArticleId={expandedArticleId}
-          expandedSummaryId={expandedSummaryId}
-          setExpandedArticleId={setExpandedArticleId}
-          setExpandedSummaryId={setExpandedSummaryId}
-          showViewAll={false}
+          showViewAll={false} // Disable "Shiko Gjitha" link
         />
-
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center items-center gap-4">
             <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
               className="px-4 py-2 text-sm bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Paraardhës
             </button>
-            
+
             <span className="text-sm text-muted-foreground">
               Faqja {currentPage} nga {totalPages}
             </span>
-
             <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
               className="px-4 py-2 text-sm bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >

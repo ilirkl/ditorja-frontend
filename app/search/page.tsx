@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { Article } from "@/types/article";
 import { getArticlesBySearch } from "@/lib/supabase";
@@ -13,8 +12,6 @@ export default function SearchPage({
 }: {
   searchParams: { q: string };
 }) {
-  const [expandedArticleId, setExpandedArticleId] = useState<string | null>(null);
-  const [expandedSummaryId, setExpandedSummaryId] = useState<string | null>(null);
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,12 +27,12 @@ export default function SearchPage({
           setArticles(results);
         }
       } catch (error) {
-        console.error('Search error:', error);
+        console.error("Search error:", error);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchResults();
   }, [searchParams.q]);
 
@@ -53,7 +50,7 @@ export default function SearchPage({
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="container py-8">
-          <p className="text-muted-foreground">Duke kërkuar për  &quot;{searchParams.q}&quot;...</p>
+          <p className="text-muted-foreground">Duke kërkuar për &quot;{searchParams.q}&quot;...</p>
         </div>
         <Footer />
       </div>
@@ -66,7 +63,7 @@ export default function SearchPage({
         <Navbar />
         <div className="container py-8">
           <h2 className="text-xl">
-            {searchParams.q 
+            {searchParams.q
               ? `Nuk u gjet asnjë rezultat për "${searchParams.q}"`
               : "Shkruani një term kërkimi për të filluar"}
           </h2>
@@ -86,41 +83,35 @@ export default function SearchPage({
         <div className="mb-4">
           <div className="py-2 ml-4">
             <h1 className="text-2xl font-bold mb-2">
-              Rezultatet e kërkimit për:  &quot;{searchParams.q}&quot;
+              Rezultatet e kërkimit për: &quot;{searchParams.q}&quot;
             </h1>
             <Link href="/" className="text-sm text-blue-600 hover:underline">
               ← Kthehu në faqen kryesore
             </Link>
           </div>
         </div>
-          <NewsSection
-            articles={articles}
-            start={startIndex}
-            end={endIndex}
-            expandedArticleId={expandedArticleId}
-            expandedSummaryId={expandedSummaryId}
-            setExpandedArticleId={setExpandedArticleId}
-            setExpandedSummaryId={setExpandedSummaryId}
-            showViewAll={false}
-            isSearchResult={true}
-          />
-
+        <NewsSection
+          articles={articles} // Pass only static data
+          start={startIndex}
+          end={endIndex}
+          showViewAll={false} // Disable "Shiko Gjitha" link
+          isSearchResult={true} // Indicate that this is a search result
+        />
         {totalPages > 1 && (
           <div className="mt-8 flex justify-center items-center gap-4">
             <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
               className="px-4 py-2 text-sm bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Paraardhës
             </button>
-            
+
             <span className="text-sm text-muted-foreground">
               Faqja {currentPage} nga {totalPages}
             </span>
-
             <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
               className="px-4 py-2 text-sm bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >

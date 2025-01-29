@@ -39,26 +39,35 @@ export const NewsSection = ({
           )}
         </div>
       )}
-      
+      {isSearchResult && (
+        <p className="text-muted-foreground italic">
+          These articles are the results of your search.
+        </p>
+      )}
       <div className="space-y-6">
         {articles.slice(start, end).map((article, index, arr) => (
-          <Card 
-            key={article.id} 
+          <Card
+            key={article.id}
             className={`border-0 shadow-none ${
-              index !== arr.length - 1 ? 'border-b border-gray-200 pb-4' : ''
+              index !== arr.length - 1 ? "border-b border-gray-200 pb-4" : ""
             }`}
           >
             <CardContent className="p-0">
               <div className="flex gap-4">
                 <div className="flex-1 min-w-0">
-                  <Category className="text-sm" href={`/categories/${formatCategorySlug(article.article_category)}`}>
+                  <Category
+                    className="text-sm"
+                    href={`/categories/${formatCategorySlug(article.article_category)}`}
+                  >
                     {article.article_category}
                   </Category>
                   <div className="space-y-2">
-                    <div 
+                    <div
                       className="cursor-pointer"
                       onClick={() => {
-                        setExpandedArticleId(prev => prev === article.id ? null : article.id);
+                        setExpandedArticleId((prev) =>
+                          prev === article.id ? null : article.id
+                        );
                         setExpandedSummaryId(null);
                       }}
                     >
@@ -74,13 +83,19 @@ export const NewsSection = ({
                       </div>
                     </div>
                     {expandedArticleId === article.id && (
-                      <div 
+                      <div
                         className="cursor-pointer"
-                        onClick={() => setExpandedSummaryId(prev => prev === article.id ? null : article.id)}
+                        onClick={() =>
+                          setExpandedSummaryId((prev) =>
+                            prev === article.id ? null : article.id
+                          )
+                        }
                       >
                         {expandedSummaryId !== article.id ? (
                           <div className="flex items-center gap-2">
-                            <p className="text-sm text-muted-foreground flex-1">{article.article_short}</p>
+                            <p className="text-sm text-muted-foreground flex-1">
+                              {article.article_short}
+                            </p>
                             <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
                           </div>
                         ) : (
@@ -93,15 +108,16 @@ export const NewsSection = ({
                         )}
                       </div>
                     )}
-                    {expandedArticleId === article.id && expandedSummaryId === article.id && (
-                      <Link 
-                        href={`/article/${article.title_slug}`}
-                        className="text-sm text-blue-600 hover:underline block"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Lexo →
-                      </Link>
-                    )}
+                    {expandedArticleId === article.id &&
+                      expandedSummaryId === article.id && (
+                        <Link
+                          href={`/article/${article.title_slug}`}
+                          className="text-sm text-blue-600 hover:underline block"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Lexo →
+                        </Link>
+                      )}
                   </div>
                   <div className="flex gap-4 text-sm text-muted-foreground">
                     <time>{new Date(article.created_at).toLocaleDateString()}</time>
