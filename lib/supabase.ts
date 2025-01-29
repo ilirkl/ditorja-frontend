@@ -225,11 +225,16 @@ export async function getArticleBySlug(slug: string | undefined) {
 
 export async function getRelatedArticles(currentArticle: Article, limit = 3): Promise<Article[]> {
   if (!currentArticle.article_hashtag || currentArticle.article_hashtag.length === 0) {
-    console.log("No hashtags found on the current article.");
     return [];
   }
 
   try {
+    const hashtagConditions = currentArticle.article_hashtag.map(hashtag => 
+      `article_hashtag.ilike.%${hashtag.trim()}%`
+    );
+
+    const orCondition = `${hashtagConditions.join(',')}`;
+
     const { data, error } = await supabase
       .from("ditorja_frontend")
       .select(
@@ -246,23 +251,47 @@ export async function getRelatedArticles(currentArticle: Article, limit = 3): Pr
         status,
         title_slug`
       )
-      .neq('id', currentArticle.id) // Exclude current article
-      .filter('article_hashtag', 'ilike', `%${currentArticle.article_hashtag}%`) // Match the hashtag
+      .neq('id', currentArticle.id)
+      .or(orCondition)
       .limit(limit)
       .order('created_at', { ascending: false });
 
-    // Log the response
-    if (data) {
-      console.log("Related articles data:", data);
-    }
     if (error) {
       console.error("Error fetching related articles:", error.message);
       return [];
     }
-
     return data.map(processArticle) as Article[];
   } catch (error) {
     console.error("Unexpected error fetching related articles:", error);
+    return [];
+  }
+}
+
+export async function getCategories(): Promise<{ category: string; slug: string }[]> {
+  try {
+    const { data, error } = await supabase
+      .from("ditorja_frontend")
+      .select("article_category, category_slug") // Fetch both category name and slug
+      .not("article_category", "eq", null) // Ensure no null values
+      .order("article_category", { ascending: true })
+      .limit(50); // Optional: Limit the number of categories
+
+    if (error) {
+      console.error("Error fetching categories:", error.message);
+      return [];
+    }
+
+    // Extract unique categories and their slugs
+    const uniqueCategories = Array.from(
+      new Map(data.map((item) => [item.article_category, item])).values()
+    );
+
+    return uniqueCategories.map(({ article_category, category_slug }) => ({
+      category: article_category,
+      slug: category_slug || article_category.toLowerCase().replace(/\s+/g, "-"), // Fallback to generated slug if missing
+    }));
+  } catch (error) {
+    console.error("Unexpected error fetching categories:", error);
     return [];
   }
 }
